@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "95767135297",
+    "project_id": "uberapp-f38bb",
+    "storage_bucket": "uberapp-f38bb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:95767135297:android:602c4984670e1d66c1b2c0",
+        "android_client_info": {
+          "package_name": "dsi32.android.locationapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "95767135297-7ck00n4f02a7hp11uq4jh5ke668tjqm2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7YyH6tnQw711T_b8BXIYaKLDdEEscBfc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "95767135297-7ck00n4f02a7hp11uq4jh5ke668tjqm2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

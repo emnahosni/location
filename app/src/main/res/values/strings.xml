@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">LocationApp</string>
+    <string name="title_activity_driver_map">Map</string>
+    <string name="title_activity_driver_maps">Map</string>
+    <string name="title_activity_customer_maps">Map</string>
+    <string name="title_activity_dr_maps">Map</string>
+</resources>
