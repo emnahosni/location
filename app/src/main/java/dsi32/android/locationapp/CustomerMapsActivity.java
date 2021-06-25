@@ -24,6 +24,8 @@ import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -39,6 +41,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -50,6 +53,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     private GoogleMap mMap;
     Location mLastLocation;
     LocationRequest mLocationRequest;
+    private GeoFire geoFire;
     private FusedLocationProviderClient mFusedLocationClient;
     private static final String TAG = "CustomerMapsActivity";
     private Geocoder geocoder;
@@ -97,27 +101,83 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
             }
         });
+
         mRequest=(Button)findViewById(R.id.request);
         mRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                DatabaseReference ref = db.getReference("CustomerRequest");
-                GeoFire geoFire=new GeoFire(ref);
-
+                geoFire = new GeoFire(db.getReference().child("CustomerRequest"));
+                String key = geoFire.getDatabaseReference().push().getKey();
+                geoFire.setLocation(userId, new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), new GeoFire.CompletionListener() {
+                    @Override
+                    public void onComplete(String key, DatabaseError error) {
+                        Log.e(TAG, "GeoFire Complete");
+                    }
+                });
                 pickupLocation=new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
                 mMap.addMarker(new MarkerOptions().position(pickupLocation).title("pick_up here"));
+
                 mRequest.setText("gettig your driving");
-
-                getCloserDriver();
-
             }
         });
     }
-    private void getCloserDriver(){
-        
-    }
+    private void saveUserLocation(Location location){
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        /*DatabaseReference ref = db.getReference("DriverAvailable");
+        GeoFire geoFire=new GeoFire(ref);*/
+        geoFire = new GeoFire(db.getReference().child("CustomersLocation"));
+        String key = geoFire.getDatabaseReference().push().getKey();
+        geoFire.setLocation(userId,new GeoLocation(location.getLatitude(),location.getLongitude()),new GeoFire.CompletionListener() {
+            @Override
+            public void onComplete(String key, DatabaseError error) {
+                Log.e(TAG, "GeoFire Complete");
+            }
+        });
 
+    }
+   /* private int radius =1;
+    private boolean driverFound = false;
+    private String driverFoundID ;
+    private void getCloserDriver(){
+
+        DatabaseReference driverLocation = FirebaseDatabase.getInstance().getReference().child("DriverAvailable");
+        GeoFire geoFire= new GeoFire(driverLocation);
+        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(pickupLocation.latitude,pickupLocation.longitude),radius);
+        geoQuery.removeAllListeners();
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            public void onKeyEntered(String key, GeoLocation location) {
+                if(!driverFound){
+                    driverFound=true;
+                    driverFoundID=key;
+                }
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+                if(!driverFound){
+                    radius++;
+                    getCloserDriver();
+                }
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
+    }*/
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -132,6 +192,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20));
                         mMap.addMarker(new MarkerOptions().position(latLng));
+                        saveUserLocation(location);
                     }
                 });
 

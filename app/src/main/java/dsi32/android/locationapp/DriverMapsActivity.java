@@ -68,7 +68,7 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
                 LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 21));
                 mMap.addMarker(new MarkerOptions().position(latLng));
-                saveUserLocation(mLastLocation);
+
             }
         }
     };
@@ -103,10 +103,10 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
     }
     private void saveUserLocation(Location location){
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference ref = db.getReference("DriverAvailable");
-        GeoFire geoFire=new GeoFire(ref);
-        //geoFire = new GeoFire(db.getReference().child("DriverAvailable"));
-        //String key = geoFire.getDatabaseReference().push().getKey();
+        /*DatabaseReference ref = db.getReference("DriverAvailable");
+        GeoFire geoFire=new GeoFire(ref);*/
+        geoFire = new GeoFire(db.getReference().child("DriverAvailable"));
+        String key = geoFire.getDatabaseReference().push().getKey();
         geoFire.setLocation(userId,new GeoLocation(location.getLatitude(),location.getLongitude()),new GeoFire.CompletionListener() {
             @Override
             public void onComplete(String key, DatabaseError error) {
@@ -129,6 +129,7 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
                         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 20));
                         mMap.addMarker(new MarkerOptions().position(latLng));
+                        saveUserLocation(location);
 
                     }
                 });
